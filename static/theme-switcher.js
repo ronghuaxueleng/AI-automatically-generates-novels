@@ -1,4 +1,22 @@
 // theme-switcher.js
+// 确保在页面加载时初始化主题切换器
+(function() {
+    // 等待DOM完全加载后初始化
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initThemeSwitcher);
+    } else {
+        initThemeSwitcher();
+    }
+    
+    function initThemeSwitcher() {
+        if (!window.themeSwitcherInitialized) {
+            window.themeSwitcherInitialized = true;
+            new EnhancedStyleSwitcher();
+            console.log('主题切换器已初始化');
+        }
+    }
+})();
+
 class EnhancedStyleSwitcher {
     constructor() {
         this.themes = this.initializeThemes();
@@ -135,7 +153,9 @@ class EnhancedStyleSwitcher {
                 textAreaStyle: {
                     height: 'auto',
                     minHeight: '100px',
-                    maxHeight: '250px'
+                    maxHeight: '400px',
+                    width: '100%',
+                    overflowY: 'auto'
                 }
             },
             flex: {
@@ -147,19 +167,30 @@ class EnhancedStyleSwitcher {
                 },
                 textAreaStyle: {
                     flex: '1 1 300px',
-                    height: '150px'
+                    minHeight: '150px',
+                    maxHeight: '400px',
+                    width: '100%',
+                    overflowY: 'auto'
                 }
             },
             masonry: {
                 containerStyle: {
-                    columnCount: 3,
+                    columnCount: 'auto',
+                    columnWidth: '300px',
                     columnGap: '20px',
                     padding: '20px'
                 },
                 textAreaStyle: {
                     breakInside: 'avoid',
-                    marginBottom: '20px'
-                }
+                    marginBottom: '20px',
+                    width: '100%',
+                    maxHeight: 'none'
+                },
+                responsiveRules: [
+                    { breakpoint: 768, columns: 1 },
+                    { breakpoint: 1024, columns: 2 },
+                    { breakpoint: 1440, columns: 3 }
+                ]
             },
             centered: {
                 containerStyle: {
@@ -170,8 +201,8 @@ class EnhancedStyleSwitcher {
                     padding: '20px'
                 },
                 textAreaStyle: {
-                    width: '80%',
-                    maxWidth: '800px',
+                    width: '100%',
+                    maxWidth: '1200px',
                     height: 'auto'
                 }
             }
@@ -223,16 +254,14 @@ class EnhancedStyleSwitcher {
         this.initializeDragging(switcher);
         this.initializeMenuBehavior(switcher);
     }
-addSwitcherStyles() {
+
+    addSwitcherStyles() {
         const styles = document.createElement('style');
         styles.textContent = `
             .enhanced-theme-switcher {
-    pointer-events: auto;
-    touch-action: none;
-    user-select: none;
-    pointer-events: auto;
-    touch-action: none;
-    user-select: none;
+                pointer-events: auto;
+                touch-action: none;
+                user-select: none;
                 position: fixed !important;
                 right: 20vw !important;
                 bottom: 20vh !important;
@@ -244,256 +273,245 @@ addSwitcherStyles() {
                 height: 80px;
                 background: var(--primary-color);
                 border-radius: 50%;
-                cursor: pointer;
-                box-shadow: var(--shadow);
-                transition: var(--transition);
-                position: relative;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
                 display: flex;
-                align-items: center;
                 justify-content: center;
-            }
-
-            .theme-text {
-                color: white;
-                font-size: 14px;
-                font-weight: 500;
-                text-align: center;
-                pointer-events: none;
+                align-items: center;
+                cursor: pointer;
+                transition: transform 0.3s ease;
+                position: relative;
+                z-index: 9999;
+                opacity: 1 !important;
             }
 
             .theme-ball:hover {
                 transform: scale(1.1);
-                box-shadow: var(--shadow-hover);
+            }
+
+            .theme-text {
+                color: white;
+                font-size: 12px;
+                text-align: center;
+                line-height: 1.2;
+                padding: 5px;
+                pointer-events: none;
             }
 
             .theme-menu {
                 position: absolute;
-                bottom: 100%;
-                right: 0;
+                top: -250px;
+                left: -150px;
+                width: 320px;
                 background: white;
-                border-radius: 16px;
+                border-radius: 12px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
                 padding: 15px;
-                margin-bottom: 15px;
-                box-shadow: var(--shadow);
                 display: none;
-                flex-direction: column;
-                gap: 10px;
-                min-width: 200px;
-                max-width: 280px;
-                backdrop-filter: blur(10px);
-                background: rgba(255, 255, 255, 0.98);
-                border: 1px solid var(--border-color);
+                z-index: 10000;
             }
 
-            .menu-section {
-                border-bottom: 1px solid var(--border-color);
-                padding-bottom: 15px;
-            }
-
-            .menu-section:last-child {
-                border-bottom: none;
-                padding-bottom: 0;
-            }
-
-            .menu-section h3 {
-                color: var(--text-secondary);
-                font-size: 14px;
-                margin-bottom: 10px;
-                font-weight: 500;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            .menu-section h3::before {
-                content: '';
-                width: 4px;
-                height: 14px;
-                background: var(--primary-color);
-                border-radius: 2px;
-            }
-
-            .theme-btn, .layout-btn, .settings-btn, .edit-btn {
-                width: 100%;
-                padding: 8px;
-                margin: 3px 0;
-                border: none;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: var(--transition);
-                font-weight: 500;
-                background: var(--bg-light);
-                color: var(--text-color);
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                position: relative;
-                overflow: hidden;
-            }
-
-            .theme-btn::after, .layout-btn::after, .settings-btn::after, .edit-btn::after {
-                content: '';
-                position: absolute;
-                width: 5px;
-                height: 5px;
-                background: var(--primary-color);
-                border-radius: 50%;
-                right: 10px;
-                opacity: 0;
-                transition: var(--transition);
-            }
-
-            .theme-btn:hover::after, .layout-btn:hover::after, 
-            .settings-btn:hover::after, .edit-btn:hover::after {
-                opacity: 1;
-            }
-
-            .theme-btn:hover, .layout-btn:hover, 
-            .settings-btn:hover, .edit-btn:hover {
-                transform: translateX(-5px);
-                background: var(--bg-dark);
-            }
-
-            .active-mode {
-                background: var(--primary-color) !important;
-                color: white !important;
-            }
-
-            /* 专注模式样式 */
-            .focus-mode .text-area:not(:focus) {
-                opacity: 0.5;
-            }
-
-            .focus-mode .text-area:focus {
-    min-height: 150px;
-    max-height: 400px;
-    overflow-y: auto;
-    min-height: 150px;
-    max-height: 400px;
-    overflow-y: auto;
-                position: fixed !important;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 80%;
-                max-width: 700px;
-                height: 60vh; max-height: 400px;
-                z-index: 1000;
-                background: var(--bg-light);
-                box-shadow: var(--shadow-hover);
-            }
-
-            /* 遮罩层 */
-            .overlay {
-                display: none;
-                position: fixed !important;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 999;
-                backdrop-filter: blur(3px);
-            }
-
-            .focus-mode .overlay.active {
+            .theme-menu.open {
                 display: block;
+                animation: menuFadeIn 0.3s forwards;
             }
 
-            /* 自动居中模式 */
-.auto-center .text-area:focus {
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-    margin: 20px auto;
-    width: 80%;
-    max-width: 700px;
-    min-height: 150px;
-    max-height: 350px;
-    overflow-y: auto;
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-    margin: 20px auto;
-    width: 80%;
-    max-width: 700px;
-    min-height: 150px;
-    max-height: 350px;
-    overflow-y: auto;
-                position: relative;
-                top: 50%;
-                transform: translateY(-50%);
-                margin: 20px auto;
-                width: 80%;
-                max-width: 700px;
-            }
-
-            /* 响应式设计 */
-            @media (max-width: 768px) {
-    .text-area {
-        min-height: 60px;
-        max-height: 300px;
-    }
-                .theme-menu {
-                    position: fixed !important;
-                    bottom: 100px;
-                    right: 10px;
-                    width: calc(100% - 20px);
-                    max-width: none;
-                }
-
-                .focus-mode .text-area:focus {
-    min-height: 150px;
-    max-height: 400px;
-    overflow-y: auto;
-    min-height: 150px;
-    max-height: 400px;
-    overflow-y: auto;
-                    width: 95%;
-                    height: 70vh;
-                }
-            }
-
-            /* 动画效果 */
-            @keyframes slideIn {
+            @keyframes menuFadeIn {
                 from {
                     opacity: 0;
-                    transform: translateY(10px);
+                    transform: scale(0.95);
                 }
                 to {
                     opacity: 1;
-                    transform: translateY(0);
+                    transform: scale(1);
                 }
             }
 
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
+            .menu-section {
+                margin-bottom: 15px;
             }
 
-            .theme-menu.show {
-                animation: slideIn 0.3s ease;
+            .menu-section h3 {
+                color: #333;
+                font-size: 14px;
+                margin-bottom: 8px;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 5px;
             }
 
-            /* 预览效果 */
-            .theme-preview {
-                position: absolute;
-                right: calc(100% + 10px);
-                top: 50%;
-                transform: translateY(-50%);
-                width: 150px;
-                height: 100px;
-                border-radius: 8px;
-                box-shadow: var(--shadow);
-                pointer-events: none;
-                opacity: 0;
-                transition: var(--transition);
+            .theme-btn, .layout-btn, .edit-btn, .settings-btn {
+                border: none;
+                padding: 6px 12px;
+                margin: 3px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 12px;
+                transition: background 0.2s ease;
+                background: #f0f0f0;
+                color: #333;
+                outline: none;
+                display: inline-block;
+                text-align: center;
             }
 
-            .theme-btn:hover .theme-preview {
-                opacity: 1;
+            .theme-btn:hover, .layout-btn:hover, .edit-btn:hover, .settings-btn:hover {
+                background: #e0e0e0;
+            }
+
+            .active-mode {
+                background: var(--primary-color);
+                color: white;
+            }
+            
+            /* 主题特定样式 */
+            .elegant-theme {
+                background-color: #2196F3;
+                color: white;
+            }
+
+            .dark-theme {
+                background-color: #455A64;
+                color: white;
+            }
+
+            .flat-theme {
+                background-color: #f9f9f9;
+                color: #333;
+                border: 1px solid #ddd;
+            }
+
+            .nature-theme {
+                background-color: #4CAF50;
+                color: white;
+            }
+
+            .sunset-theme {
+                background-color: #FF9800;
+                color: white;
+            }
+
+            /* 自定义布局样式 */
+            .grid-layout .container {
+                display: grid !important;
+            }
+
+            .flex-layout .container {
+                display: flex !important;
+                flex-wrap: wrap !important;
+            }
+
+            .masonry-layout .container {
+                column-count: auto !important;
+                column-width: 300px !important;
+            }
+
+            .centered-layout .container {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+            }
+
+            .centered-layout .text-area {
+                max-width: 1200px !important;
+            }
+
+            /* 响应式样式 */
+            @media screen and (max-width: 768px) {
+                .theme-menu {
+                    left: -100px;
+                    width: 280px;
+                    max-height: 400px;
+                    overflow-y: auto;
+                }
+                
+                .enhanced-theme-switcher {
+                    right: 20px !important;
+                    bottom: 20px !important;
+                }
+                
+                .theme-ball {
+                    width: 60px;
+                    height: 60px;
+                }
+                
+                .grid-layout .container {
+                    grid-template-columns: 1fr !important;
+                }
+                
+                .masonry-layout .container {
+                    column-count: 1 !important;
+                }
+                
+                .flex-layout .text-area {
+                    flex: 1 1 100% !important;
+                }
+                
+                .centered-layout .container > * {
+                    width: 95% !important;
+                    max-width: 950px !important;
+                }
+            }
+            
+            @media screen and (min-width: 769px) and (max-width: 1024px) {
+                .masonry-layout .container {
+                    column-count: 2 !important;
+                }
+            }
+            
+            @media screen and (min-width: 1025px) {
+                .masonry-layout .container {
+                    column-count: 3 !important;
+                }
+            }
+            
+            /* 章节容器样式优化 */
+            .grid-layout .chapter-container {
+                grid-column: 1 / -1 !important;
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+            
+            .flex-layout .chapter-container {
+                flex: 1 1 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+            
+            .masonry-layout .chapter-container {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                margin-bottom: 20px;
+            }
+            
+            .centered-layout .chapter-container {
+                width: 100%;
+                max-width: 800px;
+                margin: 0 auto 20px auto;
+            }
+            
+            /* 改进文本区域滚动条样式 */
+            .text-area {
+                scrollbar-width: thin;
+                scrollbar-color: var(--primary-color) transparent;
+            }
+            
+            .text-area::-webkit-scrollbar {
+                width: 8px;
+            }
+            
+            .text-area::-webkit-scrollbar-thumb {
+                background-color: var(--primary-color);
+                border-radius: 4px;
+            }
+            
+            .text-area::-webkit-scrollbar-track {
+                background: transparent;
             }
         `;
+
         document.head.appendChild(styles);
     }
 
@@ -505,9 +523,11 @@ addSwitcherStyles() {
         themeBall.addEventListener('click', (e) => {
             if (e.target.closest('.theme-menu')) return;
             this.menuOpen = !this.menuOpen;
-            themeMenu.style.display = this.menuOpen ? 'flex' : 'none';
+            
             if (this.menuOpen) {
-                themeMenu.classList.add('show');
+                themeMenu.classList.add('open');
+            } else {
+                themeMenu.classList.remove('open');
             }
         });
 
@@ -515,7 +535,15 @@ addSwitcherStyles() {
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.enhanced-theme-switcher')) {
                 this.menuOpen = false;
-                themeMenu.style.display = 'none';
+                themeMenu.classList.remove('open');
+            }
+        });
+
+        // 按ESC键关闭菜单
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.menuOpen) {
+                this.menuOpen = false;
+                themeMenu.classList.remove('open');
             }
         });
     }
@@ -523,36 +551,99 @@ addSwitcherStyles() {
     initializeButtons(switcher) {
         // 主题按钮
         switcher.querySelectorAll('.theme-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const theme = e.target.dataset.theme;
+            btn.addEventListener('click', () => {
+                const theme = btn.dataset.theme;
                 this.applyTheme(theme);
+                
+                // 更新按钮状态
+                switcher.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active-mode'));
+                btn.classList.add('active-mode');
             });
+            
+            // 设置初始选中状态
+            if (btn.dataset.theme === this.currentTheme) {
+                btn.classList.add('active-mode');
+            }
         });
-
+        
         // 布局按钮
         switcher.querySelectorAll('.layout-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const layout = e.target.dataset.layout;
+            btn.addEventListener('click', () => {
+                const layout = btn.dataset.layout;
                 this.applyLayout(layout);
-                this.updateActiveButtons('layout-btn', layout);
+                
+                // 更新按钮状态
+                switcher.querySelectorAll('.layout-btn').forEach(b => b.classList.remove('active-mode'));
+                btn.classList.add('active-mode');
             });
+            
+            // 设置初始选中状态
+            if (btn.dataset.layout === this.currentLayout) {
+                btn.classList.add('active-mode');
+            }
         });
-
-        // 编辑模式按钮
-        const focusBtn = switcher.querySelector('#toggleFocus');
-        const autoCenterBtn = switcher.querySelector('#toggleAutoCenter');
         
-        focusBtn.addEventListener('click', () => this.toggleFocusMode());
-        autoCenterBtn.addEventListener('click', () => this.toggleAutoCenter());
-
-        // 设置按钮
+        // 专注模式
+        const focusBtn = switcher.querySelector('#toggleFocus');
+        if (focusBtn) {
+            focusBtn.addEventListener('click', () => {
+                this.toggleFocusMode();
+            });
+            
+            // 设置初始状态
+            if (document.body.classList.contains('focus-mode')) {
+                focusBtn.classList.add('active-mode');
+            }
+        }
+        
+        // 自动居中
+        const autoCenterBtn = switcher.querySelector('#toggleAutoCenter');
+        if (autoCenterBtn) {
+            autoCenterBtn.addEventListener('click', () => {
+                this.toggleAutoCenter();
+            });
+            
+            // 设置初始状态
+            if (document.body.classList.contains('auto-center')) {
+                autoCenterBtn.classList.add('active-mode');
+            }
+        }
+        
+        // 清除数据
         const resetBtn = switcher.querySelector('#resetData');
-        const animationsBtn = switcher.querySelector('#toggleAnimations');
-
-        resetBtn.addEventListener('click', () => this.resetAllData());
-        animationsBtn.addEventListener('click', () => this.toggleAnimations());
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                if (confirm('确定要清除所有保存的数据吗？这将恢复默认设置。')) {
+                    localStorage.removeItem('theme-switcher-settings');
+                    this.applyTheme('elegant');
+                    this.applyLayout('grid');
+                    document.body.classList.remove('focus-mode', 'auto-center');
+                    this.showNotification('已恢复默认设置', 'success');
+                    
+                    // 重新加载页面
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                }
+            });
+        }
+        
+        // 动画开关
+        const toggleAnimationsBtn = switcher.querySelector('#toggleAnimations');
+        if (toggleAnimationsBtn) {
+            toggleAnimationsBtn.addEventListener('click', () => {
+                this.toggleAnimations();
+            });
+            
+            // 设置初始状态
+            if (!this.animationsEnabled) {
+                toggleAnimationsBtn.classList.add('active-mode');
+                document.documentElement.style.setProperty('--transition', 'none');
+            }
+        }
     }
-initializeDragging(element) {
+
+    initializeDragging(element) {
         let isDragging = false;
         let currentX;
         let currentY;
@@ -722,27 +813,148 @@ initializeDragging(element) {
     }
 
     initializeResizeObserver() {
-        const resizeObserver = new ResizeObserver(entries => {
-            for (const entry of entries) {
-                if (entry.target.classList.contains('text-area')) {
-                    this.adjustTextAreaSize(entry.target);
+        // 创建一个新的MutationObserver来监视DOM变化
+        this.observer = new MutationObserver((mutations) => {
+            let shouldReapplyLayout = false;
+            
+            // 检查是否有相关变化
+            mutations.forEach(mutation => {
+                if (mutation.type === 'childList') {
+                    // 如果添加了新节点
+                    if (mutation.addedNodes.length > 0) {
+                        // 检查是否添加了新的文本区域或章节
+                        mutation.addedNodes.forEach(node => {
+                            if (node.nodeType === 1) { // 元素节点
+                                if (node.classList && 
+                                    (node.classList.contains('text-area') || 
+                                     node.classList.contains('chapter-container'))) {
+                                    shouldReapplyLayout = true;
+                                }
+                                // 检查是否有文本区域的子节点
+                                const textAreas = node.querySelectorAll ? 
+                                    node.querySelectorAll('.text-area') : [];
+                                if (textAreas.length > 0) {
+                                    shouldReapplyLayout = true;
+                                }
+                            }
+                        });
+                    }
                 }
+            });
+            
+            // 如果有相关变化，重新应用布局
+            if (shouldReapplyLayout && this.currentLayout) {
+                // 延迟执行以确保DOM更新完成
+                setTimeout(() => {
+                    this.applyLayout(this.currentLayout);
+                }, 100);
             }
         });
+        
+        // 开始观察整个文档的变化
+        this.observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        
+        // 添加一个滚动事件处理器，记住居中布局的滚动位置
+        window.addEventListener('scroll', this.debounce(() => {
+            if (this.currentLayout === 'centered') {
+                localStorage.setItem('centered-scroll-position', window.scrollY.toString());
+            }
+        }, 200));
+    }
+    
+    // 防抖函数
+    debounce(func, wait) {
+        let timeout;
+        return function() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                func.apply(context, args);
+            }, wait);
+        };
+    }
 
-        this.textAreas.forEach(textArea => {
-            resizeObserver.observe(textArea);
+    applyLayoutToChapters(chaptersContainer, layoutName) {
+        const layout = this.layouts[layoutName];
+        const chapterContainers = chaptersContainer.querySelectorAll('.chapter-container');
+        
+        chapterContainers.forEach(container => {
+            // 清除之前的布局样式
+            this.clearChapterContainerStyles(container);
+            
+            // 根据布局类型设置章节样式
+            if (layoutName === 'grid') {
+                container.style.gridColumn = '1 / -1'; // 章节占满整行
+                container.style.display = 'grid';
+                container.style.gridTemplateColumns = '1fr';
+                container.style.gap = '10px';
+            } 
+            else if (layoutName === 'flex') {
+                container.style.flex = '1 1 100%'; // 占满整行
+                container.style.display = 'flex';
+                container.style.flexDirection = 'column';
+                container.style.gap = '10px';
+            }
+            else if (layoutName === 'masonry') {
+                container.style.breakInside = 'avoid';
+                container.style.pageBreakInside = 'avoid';
+                container.style.width = '100%';
+                container.style.marginBottom = '20px';
+            }
+            else if (layoutName === 'centered') {
+                container.style.width = '100%';
+                container.style.maxWidth = '1200px';
+                container.style.margin = '0 auto 20px auto';
+            }
+            
+            // 确保文本区域正确样式
+            const textAreas = container.querySelectorAll('.text-area');
+            textAreas.forEach(textArea => {
+                // 清除文本区域样式
+                this.clearTextAreaStyles(textArea);
+                // 应用新样式
+                Object.assign(textArea.style, layout.textAreaStyle);
+                this.autoResizeTextArea(textArea);
+            });
+        });
+    }
+    
+    clearChapterContainerStyles(container) {
+        // 清除章节容器的布局相关样式
+        const stylesToClear = [
+            'display', 'gridColumn', 'gridTemplateColumns', 'flex',
+            'flexDirection', 'breakInside', 'pageBreakInside',
+            'width', 'maxWidth', 'margin', 'gap'
+        ];
+        
+        stylesToClear.forEach(style => {
+            container.style[style] = '';
         });
     }
 
-    adjustTextAreaSize(textArea) {
-        if (document.body.classList.contains('auto-center') && textArea === this.activeTextArea) {
-            const viewportHeight = window.innerHeight;
-            const textAreaHeight = textArea.offsetHeight;
-            textArea.style.marginTop = `${(viewportHeight - textAreaHeight) / 2}px`;
-        }
+    setupResizeHandler(layoutName) {
+        // 移除旧的resize事件监听器
+        window.removeEventListener('resize', this.resizeHandler);
+        
+        // 创建新的resize事件处理函数
+        this.resizeHandler = () => {
+            // 防抖处理
+            clearTimeout(this.resizeTimeout);
+            this.resizeTimeout = setTimeout(() => {
+                // 重新应用当前布局
+                this.applyLayout(layoutName);
+            }, 250);
+        };
+        
+        // 添加resize事件监听器
+        window.addEventListener('resize', this.resizeHandler);
     }
-applyTheme(themeName) {
+
+    applyTheme(themeName) {
         if (!this.themes[themeName]) return;
 
         const theme = this.themes[themeName];
@@ -753,38 +965,182 @@ applyTheme(themeName) {
             root.style.setProperty(property, value);
         });
 
-        // 应用主题特定样式
+        // 应用其他样式
+        root.style.setProperty('--border-radius', theme.styles.borderRadius);
+        root.style.setProperty('--transform-scale', theme.styles.transformScale);
+        root.style.setProperty('--textarea-padding', theme.styles.textAreaPadding);
+
+        // 更新文本区域样式
         this.textAreas.forEach(textArea => {
             this.applyTextAreaStyles(textArea);
         });
 
-        // 更新当前主题并保存设置
         this.currentTheme = themeName;
-        this.updateActiveButtons('theme-btn', themeName);
         this.saveSettings();
+        
+        // 更新主题按钮状态
+        this.updateActiveButtons('theme-btn', themeName);
 
-        // 应用主题特定动画
         this.showNotification(`主题已切换到: ${themeName}`, 'success');
     }
 
     applyLayout(layoutName) {
         if (!this.layouts[layoutName]) return;
+        
+        // 如果当前布局已经是目标布局，避免重复操作
+        if (this.currentLayout === layoutName && document.body.dataset.currentLayout === layoutName) {
+            return;
+        }
 
         const layout = this.layouts[layoutName];
         const containers = document.querySelectorAll('.container');
 
+        // 设置全局布局标记
+        document.body.dataset.currentLayout = layoutName;
+        
+        // 移除其他布局类
+        document.body.classList.remove('grid-layout', 'flex-layout', 'masonry-layout', 'centered-layout');
+        // 添加当前布局类
+        document.body.classList.add(`${layoutName}-layout`);
+
         containers.forEach(container => {
+            // 清除先前布局的所有特殊样式
+            this.clearPreviousLayoutStyles(container);
+            
+            // 应用新布局的样式
             Object.assign(container.style, layout.containerStyle);
             
             const textAreas = container.querySelectorAll('.text-area');
             textAreas.forEach(textArea => {
+                // 清除文本区域的特殊样式
+                this.clearTextAreaStyles(textArea);
+                // 应用新布局的文本区域样式
                 Object.assign(textArea.style, layout.textAreaStyle);
                 this.autoResizeTextArea(textArea);
             });
+            
+            // 获取大纲和章节生成区域
+            const outlineArea = document.getElementById('outline');
+            const chapterTempArea = document.getElementById('chapter-temp-content');
+            
+            if (outlineArea && chapterTempArea) {
+                // 清除大纲和章节区域的特殊样式
+                this.clearSpecialAreaStyles(outlineArea);
+                this.clearSpecialAreaStyles(chapterTempArea);
+                
+                // 特殊处理瀑布流布局
+                if (layoutName === 'masonry') {
+                    // 确保两个区域宽度相同
+                    outlineArea.style.width = '100%';
+                    chapterTempArea.style.width = '100%';
+                    
+                    // 确保它们的父容器也占据整列
+                    const outlineParent = outlineArea.closest('div');
+                    const chapterTempParent = chapterTempArea.closest('div');
+                    
+                    if (outlineParent && chapterTempParent) {
+                        outlineParent.style.breakInside = 'avoid';
+                        outlineParent.style.width = '100%';
+                        chapterTempParent.style.breakInside = 'avoid';
+                        chapterTempParent.style.width = '100%';
+                    }
+                    
+                    // 应用响应式列数
+                    if (layout.responsiveRules) {
+                        const viewportWidth = window.innerWidth;
+                        for (let i = 0; i < layout.responsiveRules.length; i++) {
+                            const rule = layout.responsiveRules[i];
+                            if (viewportWidth <= rule.breakpoint) {
+                                container.style.columnCount = rule.columns;
+                                break;
+                            } else if (i === layout.responsiveRules.length - 1) {
+                                // 最大断点，使用最多列
+                                container.style.columnCount = rule.columns;
+                            }
+                        }
+                    }
+                }
+                // 网格布局特殊处理
+                else if (layoutName === 'grid') {
+                    outlineArea.style.width = '100%';
+                    chapterTempArea.style.width = '100%';
+                    
+                    // 确保大纲和章节生成区域的父容器占据相同宽度
+                    const outlineParent = outlineArea.closest('div');
+                    const chapterTempParent = chapterTempArea.closest('div');
+                    
+                    if (outlineParent && chapterTempParent) {
+                        outlineParent.style.gridColumn = '1 / -1';
+                        chapterTempParent.style.gridColumn = '1 / -1';
+                    }
+                    
+                    // 响应式调整网格
+                    const viewportWidth = window.innerWidth;
+                    if (viewportWidth < 768) {
+                        container.style.gridTemplateColumns = '1fr'; // 小屏幕单列
+                    }
+                }
+                // 弹性布局特殊处理
+                else if (layoutName === 'flex') {
+                    outlineArea.style.width = '100%';
+                    chapterTempArea.style.width = '100%';
+                    
+                    // 确保大纲和章节生成区域的父容器占据相同宽度
+                    const outlineParent = outlineArea.closest('div');
+                    const chapterTempParent = chapterTempArea.closest('div');
+                    
+                    if (outlineParent && chapterTempParent) {
+                        outlineParent.style.flex = '1 1 100%';
+                        chapterTempParent.style.flex = '1 1 100%';
+                    }
+                    
+                    // 响应式调整
+                    const viewportWidth = window.innerWidth;
+                    if (viewportWidth < 768) {
+                        // 小屏幕下增加基础大小
+                        container.querySelectorAll('.text-area').forEach(el => {
+                            el.style.flex = '1 1 100%';
+                        });
+                    }
+                }
+                // 居中布局特殊处理
+                else if (layoutName === 'centered') {
+                    outlineArea.style.width = '100%';
+                    // 响应式宽度设置
+                    const viewportWidth = window.innerWidth;
+                    const maxWidth = viewportWidth < 768 ? '95%' : 
+                                     viewportWidth < 1200 ? '80%' : '1200px';
+                    
+                    outlineArea.style.maxWidth = maxWidth;
+                    chapterTempArea.style.width = '100%';
+                    chapterTempArea.style.maxWidth = maxWidth;
+                    
+                    // 添加滚动位置记忆功能
+                    const scrollPosition = localStorage.getItem('centered-scroll-position');
+                    if (scrollPosition) {
+                        setTimeout(() => {
+                            window.scrollTo(0, parseInt(scrollPosition));
+                        }, 100);
+                    }
+                }
+            }
         });
+
+        // 为章节容器特殊处理
+        const chaptersContainer = document.getElementById('chapters');
+        if (chaptersContainer) {
+            this.applyLayoutToChapters(chaptersContainer, layoutName);
+        }
 
         this.currentLayout = layoutName;
         this.saveSettings();
+        
+        // 重新绑定窗口大小变化事件
+        this.setupResizeHandler(layoutName);
+        
+        // 更新布局按钮状态
+        this.updateActiveButtons('layout-btn', layoutName);
+        
         this.showNotification(`布局已切换到: ${layoutName}`, 'success');
     }
 
@@ -887,9 +1243,16 @@ applyTheme(themeName) {
     }
 
     toggleAnimations() {
+        const animationsBtn = document.querySelector('#toggleAnimations');
         this.animationsEnabled = !this.animationsEnabled;
-        document.documentElement.style.setProperty('--transition', 
-            this.animationsEnabled ? this.themes[this.currentTheme].vars['--transition'] : 'none');
+        
+        if (this.animationsEnabled) {
+            document.documentElement.style.setProperty('--transition', this.themes[this.currentTheme].vars['--transition']);
+            animationsBtn.classList.remove('active-mode');
+        } else {
+            document.documentElement.style.setProperty('--transition', 'none');
+            animationsBtn.classList.add('active-mode');
+        }
         
         this.saveSettings();
         this.showNotification(`动画效果已${this.animationsEnabled ? '开启' : '关闭'}`, 'success');
@@ -964,6 +1327,56 @@ applyTheme(themeName) {
         }
 
         setTimeout(() => notification.remove(), 3000);
+    }
+
+    clearPreviousLayoutStyles(container) {
+        // 清除容器的布局相关样式
+        const stylesToClear = [
+            'display', 'gridTemplateColumns', 'flexDirection', 'flexWrap',
+            'alignItems', 'justifyContent', 'columnCount', 'columnWidth',
+            'gap', 'padding'
+        ];
+        
+        stylesToClear.forEach(style => {
+            container.style[style] = '';
+        });
+    }
+    
+    clearTextAreaStyles(textArea) {
+        // 清除文本区域的布局相关样式
+        const stylesToClear = [
+            'width', 'maxWidth', 'height', 'minHeight', 'maxHeight',
+            'flex', 'breakInside', 'marginBottom'
+        ];
+        
+        stylesToClear.forEach(style => {
+            textArea.style[style] = '';
+        });
+    }
+    
+    clearSpecialAreaStyles(element) {
+        if (!element) return;
+        
+        // 清除特殊区域的布局相关样式
+        const stylesToClear = [
+            'width', 'maxWidth', 'margin', 'padding', 'breakInside'
+        ];
+        
+        stylesToClear.forEach(style => {
+            element.style[style] = '';
+        });
+        
+        // 清除父元素的特殊样式
+        const parent = element.closest('div');
+        if (parent) {
+            const parentStylesToClear = [
+                'gridColumn', 'flex', 'breakInside', 'width', 'maxWidth'
+            ];
+            
+            parentStylesToClear.forEach(style => {
+                parent.style[style] = '';
+            });
+        }
     }
 }
 

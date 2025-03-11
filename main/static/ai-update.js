@@ -2610,10 +2610,6 @@ function initChapterListener() {
         
         // 延迟执行以确保DOM已更新
         setTimeout(() => {
-            // 获取新添加的章节容器（最后一个章节容器）
-            const chapterContainers = document.querySelectorAll('.chapter-container');
-            const newChapterContainer = chapterContainers[chapterContainers.length - 1];
-            
             // 为新添加的章节添加优化按钮
             addOptimizerButtons();
             

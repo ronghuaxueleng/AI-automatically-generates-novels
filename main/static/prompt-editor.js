@@ -261,7 +261,8 @@ class PromptEditor {
         window.generateContent = (button) => {
             this.currentOperation = 'content';
             this.currentTarget = $(button).closest('.chapter-container');
-            const prompt = $('#content-prompt').val();
+            const chapterOutline = this.currentTarget.find('.chapter-outline').val();
+            const prompt = $('#content-prompt').val().replace('${chapter_outline}', chapterOutline);
             this.show('生成正文', prompt, false);
         };
 
@@ -269,61 +270,23 @@ class PromptEditor {
         window.regenerateContent = (button) => {
             this.currentOperation = 'content';
             this.currentTarget = $(button).closest('.chapter-container');
-            const prompt = $('#content-prompt').val();
+            const chapterOutline = this.currentTarget.find('.chapter-outline').val();
+            const prompt = $('#content-prompt').val().replace('${chapter_outline}', chapterOutline);
             this.show('重写正文', prompt, false);
         };
     }
 
     // 获取变量值
     static getVariableValues() {
-        let values = {};
-        
-        // 设置通用变量
-        values['${background}'] = $('#background').val() || '';
-        values['${characters}'] = $('#characters').val() || '';
-        values['${relationships}'] = $('#relationships').val() || '';
-        values['${plot}'] = $('#plot').val() || '';
-        values['${style}'] = $('#style').val() || '';
-        values['${outline}'] = $('#outline').val() || '';
-        
-        if (this.currentOperation === 'chapters') {
-            // 设置章节细纲上下文
-            values['${previous_outlines}'] = this.getPreviousOutlines();
-        } else if (this.currentOperation === 'content') {
-            // 设置正文上下文
-            values['${previous_contents}'] = this.getPreviousContents();
-            
-            // 添加章节细纲内容
-            if (this.currentTarget) {
-                const chapterOutline = this.currentTarget.find('.chapter-outline').val();
-                values['${chapter_outline}'] = chapterOutline || '';
-            }
-        }
-        return values;
-    }
-
-    static getPreviousOutlines() {
-        let outlines = '';
-        // 选择前五个章节容器，获取其中的章节细纲
-        $('.chapter-container:lt(5)').each(function() {
-            const text = $(this).find('.chapter-outline').val();
-            if (text) {
-                outlines += text + '\n';
-            }
-        });
-        return outlines;
-    }
-
-    static getPreviousContents() {
-        let contents = '';
-        // 选择前五个章节容器，获取其中的章节正文内容
-        $('.chapter-container:lt(5)').each(function() {
-            const text = $(this).find('.chapter-content-text').val();
-            if (text) {
-                contents += text + '\n';
-            }
-        });
-        return contents;
+        return {
+            '${background}': $('#background').val(),
+            '${characters}': $('#characters').val(),
+            '${relationships}': $('#relationships').val(),
+            '${plot}': $('#plot').val(),
+            '${style}': $('#style').val(),
+            '${outline}': $('#outline').val(),
+            '${selected_text}': this.selectedText
+        };
     }
 
     // 显示编辑器

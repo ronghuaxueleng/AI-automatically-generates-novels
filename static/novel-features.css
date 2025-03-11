@@ -1,0 +1,354 @@
+/* Novel.ai风格的功能样式 */
+
+/* Lorebook样式 */
+.lorebook-panel {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100vh;
+    background: #fff;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.3s ease;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.lorebook-panel.active {
+    right: 0;
+}
+
+.lorebook-header {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lorebook-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.lorebook-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #666;
+}
+
+.lorebook-search {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.lorebook-search input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.lorebook-filter {
+    padding: 0 15px 10px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.lorebook-filter button {
+    padding: 5px 10px;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.lorebook-filter button.active {
+    background: #1890ff;
+    color: white;
+    border-color: #1890ff;
+}
+
+.lorebook-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.lorebook-sidebar {
+    width: 150px;
+    border-right: 1px solid #eee;
+    overflow-y: auto;
+    background: #f9f9f9;
+}
+
+.lorebook-entry-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.lorebook-entry-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.lorebook-entry-item:hover {
+    background: #f0f0f0;
+}
+
+.lorebook-entry-item.active {
+    background: #e6f7ff;
+    border-right: 3px solid #1890ff;
+}
+
+.lorebook-editor {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.lorebook-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.lorebook-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.lorebook-form-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+.lorebook-form-group input,
+.lorebook-form-group select,
+.lorebook-form-group textarea {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 100%;
+}
+
+.lorebook-form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.lorebook-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.lorebook-buttons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.lorebook-save {
+    background: #1890ff;
+    color: white;
+}
+
+.lorebook-delete {
+    background: #ff4d4f;
+    color: white;
+}
+
+.lorebook-cancel {
+    background: #f5f5f5;
+    border: 1px solid #d9d9d9;
+}
+
+.lorebook-toggle {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: #1890ff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 999;
+}
+
+.lorebook-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background: #f6ffed;
+    border: 1px solid #b7eb8f;
+    border-radius: 4px;
+    color: #52c41a;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 1001;
+    animation: fadeOut 3s forwards;
+    animation-delay: 2s;
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; visibility: hidden; }
+}
+
+/* 记忆管理器样式 */
+.memory-settings-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.memory-settings-header {
+    padding: 16px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.memory-settings-header h2 {
+    margin: 0;
+    color: #333;
+}
+
+.memory-settings-content {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.form-group input[type="number"],
+.form-group input[type="range"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.memory-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.memory-buttons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#saveMemorySettings {
+    background: #1890ff;
+    color: white;
+}
+
+#exportMemories, #importMemories {
+    background: #f5f5f5;
+    border: 1px solid #d9d9d9;
+}
+
+.memory-settings-close {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.memory-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+/* 记忆摘要显示 */
+.memory-summary {
+    background: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    line-height: 1.5;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.memory-summary h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+.memory-summary ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.memory-summary li {
+    margin-bottom: 5px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .lorebook-panel {
+        width: 100%;
+        right: -100%;
+    }
+    
+    .memory-settings-panel {
+        width: 90%;
+        max-width: 500px;
+    }
+} 

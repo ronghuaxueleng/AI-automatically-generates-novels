@@ -33,10 +33,7 @@ class JsMindWriterConfig {
 2. 设计3-5个重大转折点
 3. 人物塑造要立体，性格鲜明
 4. 构建层层递进的剧情架构
-5. 设置悬念、伏笔、反转
-6. 适当设置冲突情节,比如：人与人的冲突、人与命运的冲突、人与社会的冲突、阶层冲突、种族冲突、群体与群体的冲突、人与自然的冲突、人与未知的冲突、自我冲突等
-7. 控制故事的节奏，张弛有度
-8. 符合前文整体风格、情节与人物设定
+5. 设置悬念和伏笔
 
 输出格式：
 1. 故事梗概（500字）
@@ -52,17 +49,12 @@ class JsMindWriterConfig {
 背景设定：\${background}
 人物设定：\${characters}
 角色关系：\${relationships}
-前五章的细纲：\${previous_outlines}
-前五章的正文内容：\${previous_contents}
 
 为第\${chapter_number}章创建详细的章节大纲，要求：
 1. 章节结构完整，起承转合明确
 2. 情节连贯，与总体大纲呼应
 3. 人物刻画深入，展现性格特点
-4. 设置恰当的悬念、伏笔、反转
-5. 设置恰当的冲突情节,比如：人与人的冲突、人与命运的冲突、人与社会的冲突、阶层冲突、种族冲突、群体与群体的冲突、人与自然的冲突、人与未知的冲突、自我冲突等
-6. 控制故事的节奏，张弛有度
-7. 符合前文整体风格、情节与人物设定
+4. 设置恰当的悬念和伏笔
 
 输出格式：
 1. 章节主题
@@ -1250,32 +1242,6 @@ function buildPrompt(template, mindData, type) {
         return element ? (element.value || '未设置') : '未设置';
     };
 
-    // 获取前五章细纲的辅助函数
-    const getPreviousOutlines = () => {
-        let outlines = '';
-        $('.chapter-container:lt(5)').each(function() {
-            const text = $(this).find('.chapter-outline').val();
-            if (text) {
-                outlines += text + '\n';
-            }
-        });
-        console.log('获取到的前五章细纲:', outlines.substring(0, 100) + '...');
-        return outlines || '前五章细纲未提供';
-    };
-
-    // 获取前五章正文内容的辅助函数
-    const getPreviousContents = () => {
-        let contents = '';
-        $('.chapter-container:lt(5)').each(function() {
-            const text = $(this).find('.chapter-content-text').val();
-            if (text) {
-                contents += text + '\n';
-            }
-        });
-        console.log('获取到的前五章正文:', contents.substring(0, 100) + '...');
-        return contents || '前五章正文未提供';
-    };
-
     // 替换模板中的变量
     const replacements = {
         '${mind_data}': JSON.stringify(mindData, null, 2),
@@ -1285,9 +1251,7 @@ function buildPrompt(template, mindData, type) {
         '${plot}': getTextAreaContent('plot'),
         '${style}': getTextAreaContent('style'),
         '${outline}': getTextAreaContent('outline'),
-        '${chapter_number}': this.currentChapter || '1',
-        '${previous_outlines}': getPreviousOutlines(),
-        '${previous_contents}': getPreviousContents()
+        '${chapter_number}': this.currentChapter || '1'
     };
 
     let processedTemplate = template;
@@ -1308,16 +1272,6 @@ function updateTargetContent(element, content) {
     if (target) {
         target.value = content;
         target.scrollTop = target.scrollHeight;
-        
-        // 触发自定义事件，通知内容已生成完成
-        const event = new CustomEvent('jsmind-content-generated', {
-            detail: {
-                targetElement: target,
-                contentType: target.id === 'outline' ? 'outline' : 'chapter'
-            },
-            bubbles: true
-        });
-        document.dispatchEvent(event);
     }
 }
 
